@@ -8,11 +8,14 @@ namespace Gameplay.Puzzle
     {
         private Cell[] _cells;
         private Ball[] _balls;
+        private int _pathIndex;
 
         public Vector3 Position { get; private set; }
 
-        public void Init()
+        public void Init(int pathIndex)
         {
+            _pathIndex = pathIndex;
+
             _balls = GetComponentsInChildren<Ball>();
             _cells = new Cell[_balls.Length];
 
@@ -23,7 +26,9 @@ namespace Gameplay.Puzzle
                 go.transform.position = _balls[i].transform.position;
                 _cells[i] = go.AddComponent<Cell>();
 
-                _balls[i].MyIndex = i;
+                _balls[i].SetIndex(i);
+                _balls[i].SetPath(pathIndex);
+
             }
         }    
 
@@ -46,14 +51,7 @@ namespace Gameplay.Puzzle
         [ContextMenu("Rotate")]
         private void RotateClockwise()
         {            
-            Array.ForEach(_balls, b => 
-            {
-                b.MyIndex++;
-
-                if (b.MyIndex > _cells.Length - 1) 
-                    b.MyIndex = 0;
-            });
-
+            Array.ForEach(_balls, b => b.SetIndex(ChangeIndex(b.MyIndex + 1)));
             MoveBallToNextPosition();            
         }
 
@@ -61,15 +59,16 @@ namespace Gameplay.Puzzle
         [ContextMenu("Rotate back")]
         private void RotateCounterclockwise()
         {
-            Array.ForEach(_balls, b => 
-            {
-                b.MyIndex--;
-
-                if (b.MyIndex < 0) 
-                    b.MyIndex = _cells.Length -1;
-            });
-
+            Array.ForEach(_balls, b => b.SetIndex(ChangeIndex(b.MyIndex - 1)));
             MoveBallToNextPosition(); 
+        }
+
+
+        private int ChangeIndex(int index)
+        {
+            if (index < 0) index = _cells.Length -1;
+            if (index > _cells.Length -1) index = 0;
+            return index;
         }
 
 

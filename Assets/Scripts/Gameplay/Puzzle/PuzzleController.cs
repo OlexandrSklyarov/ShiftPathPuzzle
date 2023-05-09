@@ -16,7 +16,8 @@ namespace Gameplay.Puzzle
             _paths = GetComponentsInChildren<Path>();
             _sharedZones = GetComponentsInChildren<SharedZone>();
 
-            Array.ForEach(_paths, p => p.Init());
+            var pathIndex = 0;
+            Array.ForEach(_paths, p => p.Init(pathIndex++));
             Array.ForEach(_sharedZones, s => s.Init());
         }
     }
