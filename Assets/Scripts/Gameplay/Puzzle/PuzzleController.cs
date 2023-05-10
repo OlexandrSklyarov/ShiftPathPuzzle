@@ -40,6 +40,34 @@ namespace Gameplay.Puzzle
                 p.Init();
                 p.SetStartupBalls(CreateBalls(p));
             });
+
+            RandomSwapBalls();
+        }
+
+
+        private void RandomSwapBalls()
+        {
+            var counter = UnityEngine.Random.Range(5, 10);
+
+            while(counter < 10)
+            {
+                for (int i = 1; i < _paths.Length; i++)
+                {
+                    var pathA = _paths[i-1];
+                    var pathB = _paths[i];
+
+                    var a = pathA.GetRandomBall();
+                    var indexA = a.MyIndex;
+
+                    var b = pathB.GetRandomBall();
+                    var indexB = b.MyIndex;
+
+                    pathA.InsertBallToIndex(b, indexA);
+                    pathB.InsertBallToIndex(a, indexB);
+                }
+
+                counter++;
+            }
         }
 
 

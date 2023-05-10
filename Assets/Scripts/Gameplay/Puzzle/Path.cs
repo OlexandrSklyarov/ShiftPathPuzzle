@@ -3,6 +3,7 @@ using System.Collections;
 using System.Linq;
 using DG.Tweening;
 using UnityEngine;
+using Util;
 
 namespace Gameplay.Puzzle
 {
@@ -23,7 +24,7 @@ namespace Gameplay.Puzzle
         private State _state;
         private bool _isBlocked;
 
-        private const float ROTATE_DURATION = 0.5f;
+        private const float ROTATE_DURATION = 0.3f;
        
 
         public void Init()
@@ -46,9 +47,7 @@ namespace Gameplay.Puzzle
 
             for (int i = 0; i < _cells.Length; i++)
             {
-                _balls[i].SetIndex(i);
-                _balls[i].SetCurrentPathColor(_type);
-                _balls[i].transform.position = _cells[i].transform.position;
+                SetupBall(i);
             }
         }     
 
@@ -132,6 +131,37 @@ namespace Gameplay.Puzzle
         {
             var checkType = _balls[0].MyBaseColorType;
             return _balls.All(b => b.MyBaseColorType == checkType);
+        }
+
+
+        public Ball GetRandomBall()
+        {
+            return _balls.RandomElement();
+        }
+
+
+        public Ball SwapBall(Ball newBall, int index)
+        {
+            var curBall = _balls[index];
+            _balls[index] = newBall;
+            SetupBall(index);
+
+            return curBall;
+        }
+
+
+        public void InsertBallToIndex(Ball ball, int index)
+        {
+            _balls[index] = ball;
+            SetupBall(index);
+        }
+
+
+        private void SetupBall(int index)
+        {
+            _balls[index].SetIndex(index);
+            _balls[index].SetCurrentPathColor(_type);
+            _balls[index].transform.position = _cells[index].transform.position;
         }
     }
 
