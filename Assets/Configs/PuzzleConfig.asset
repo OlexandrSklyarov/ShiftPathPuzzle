@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 70ebb17781c3e73118720a20e60a7052, type: 3}
+  m_Name: PuzzleConfig
+  m_EditorClassIdentifier: 
+  <BallPrefabs>k__BackingField:
+  - <Type>k__BackingField: 0
+    <Prefab>k__BackingField: {fileID: 8238381358576330954, guid: 365575e722568a0aea5a0ed114b57043, type: 3}
+  - <Type>k__BackingField: 1
+    <Prefab>k__BackingField: {fileID: 1525925728815617700, guid: dbecf656502f51ca689415d4f269a62d, type: 3}

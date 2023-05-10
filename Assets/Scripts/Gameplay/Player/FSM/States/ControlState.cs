@@ -2,6 +2,7 @@ using UnityEngine;
 using Common.InputNew;
 using Gameplay.Puzzle;
 using TouchPhase = UnityEngine.InputSystem.TouchPhase;
+using System;
 
 namespace Gameplay.Player.FSM.States
 {
@@ -41,9 +42,8 @@ namespace Gameplay.Player.FSM.States
                 case TouchPhase.Ended:
 
                     if (_item != null)
-                    {
-                        var dir = data.EndPosition - data.StartPosition;
-                        _item.Interact(dir.normalized);
+                    {                       
+                        _item.Interact(GetSwipeDirection(data));
                         _item = null;
                     }
 
@@ -52,7 +52,14 @@ namespace Gameplay.Player.FSM.States
                 break;
             }
         }
-        
+
+
+        private Vector3 GetSwipeDirection(TouchInputManager.InputData data)
+        {
+            var dir = data.EndPosition - data.StartPosition;
+            return new Vector3(dir.x, 0f, dir.y).normalized;
+        }
+
 
         private bool TryItemSelect(Vector3 pointer, out IPuzzleInteract item)
         {

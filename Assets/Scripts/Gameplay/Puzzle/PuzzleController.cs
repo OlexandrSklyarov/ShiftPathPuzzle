@@ -1,24 +1,82 @@
 using System;
+using System.Collections.Generic;
+using Data;
 using UnityEngine;
+using System.Linq;
 
 namespace Gameplay.Puzzle
 {
     public class PuzzleController : MonoBehaviour, IPuzzleController
     {
-        bool IPuzzleController.IsCompleted => false;
+        bool IPuzzleController.IsCompleted => AllPathsCollected();        
 
+        private PuzzleData _config;
         private Path[] _paths;
         private SharedZone[] _sharedZones;
 
 
-        public void Init()
+        public void Init(PuzzleData config)
+        {
+            _config = config;
+
+            InitPaths();
+            InitSharedZones();
+        }
+
+
+        private void InitSharedZones()
+        {
+            _sharedZones = GetComponentsInChildren<SharedZone>();
+            Array.ForEach(_sharedZones, s => s.Init());
+        }
+
+
+        private void InitPaths()
         {
             _paths = GetComponentsInChildren<Path>();
-            _sharedZones = GetComponentsInChildren<SharedZone>();
 
-            var pathIndex = 0;
-            Array.ForEach(_paths, p => p.Init(pathIndex++));
-            Array.ForEach(_sharedZones, s => s.Init());
+            Array.ForEach(_paths, p =>
+            {
+                p.Init();
+                p.SetStartupBalls(CreateBalls(p));
+            });
+        }
+
+
+        private Ball[] CreateBalls(Path p)
+        {
+            var balls = new List<Ball>();
+            var prefab = _config.BallPrefabs.First(i => i.Type == p.Type).Prefab;
+
+            for (int i = 0; i < p.CellCount; i++)
+            {
+                var ball = Instantiate(prefab, p.transform);
+                ball.SwipeItemEvent += OnSwipeBallHandler;
+                balls.Add(ball);
+            }
+
+            return balls.ToArray();
+        }
+
+
+        private void OnSwipeBallHandler(Ball ball, Vector3 swipeDirection)
+        {
+            var path = _paths.First(p => p.Type == ball.CurrentPathColor);
+
+            if (path.IsBlocked) return;                        
+            
+            path.Rotate(swipeDirection, ball.MyIndex);
+        }
+
+
+        private bool AllPathsCollected()
+        {
+            for (int i = 0; i < _paths.Length; i++)
+            {
+                if (!_paths[i].IsCollected) return false;
+            }            
+
+            return true;
         }
     }
 }

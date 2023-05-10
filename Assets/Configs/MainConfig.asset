@@ -13,3 +13,4 @@ MonoBehaviour:
   m_Name: MainConfig
   m_EditorClassIdentifier: 
   <Player>k__BackingField: {fileID: 11400000, guid: 224e7f84b5fefe16e8d25153669c1672, type: 2}
+  <Puzzle>k__BackingField: {fileID: 11400000, guid: 42f364ea70c796aca9ad4edfc552826f, type: 2}

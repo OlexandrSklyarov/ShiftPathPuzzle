@@ -15,7 +15,7 @@ namespace Gameplay
 
         private void Start()
         {      
-            _puzzleController.Init();
+            _puzzleController.Init(config.Puzzle);
 
             _gameProcess = new GameProcess(config, _puzzleController);  
 
