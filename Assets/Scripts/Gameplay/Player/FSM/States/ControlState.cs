@@ -20,12 +20,14 @@ namespace Gameplay.Player.FSM.States
         public override void OnStart()
         {
             _agent.Input.InputTouchEvent += OnInputHandler;
+            _agent.Puzzle.CompletedEvent += SwitchToComplete;
         }
 
 
         public override void OnStop()
         {
             _agent.Input.InputTouchEvent -= OnInputHandler;
+            _agent.Puzzle.CompletedEvent -= SwitchToComplete;
         }
 
 
@@ -46,8 +48,6 @@ namespace Gameplay.Player.FSM.States
                         _item.Interact(GetSwipeDirection(data));
                         _item = null;
                     }
-
-                    if (_agent.Puzzle.IsCompleted) SwitchToComplete();
 
                 break;
             }

@@ -14,6 +14,8 @@ namespace Gameplay.Puzzle
         private Path[] _paths;
         private SharedZone[] _sharedZones;
 
+        public event Action CompletedEvent;
+
 
         public void Init(PuzzleData config)
         {
@@ -30,10 +32,11 @@ namespace Gameplay.Puzzle
             Array.ForEach(_sharedZones, s => 
             {
                 s.Init(_config.SharedZone);
-                s.ShiftEvent += OnShiftSharedZoneHandler;
+                s.TryShiftEvent += OnShiftSharedZoneHandler;
+                s.ShiftCompletedEvent += OnCheckCompleted;
             });
-        }
-        
+        }        
+
 
         private void InitPaths()
         {
@@ -43,6 +46,7 @@ namespace Gameplay.Puzzle
             {
                 p.Init(_config.Path);
                 p.SetStartupBalls(CreateBalls(p));
+                p.RotateCompletedEvent += OnCheckCompleted;
             });
 
             RandomSwapBalls();
@@ -117,6 +121,14 @@ namespace Gameplay.Puzzle
             if (_paths.Any(p => p.IsWorking)) return;
 
             zone.TryShift(shiftDirection);
+        }
+
+
+        private void OnCheckCompleted()
+        {
+            if (!AllPathsCollected()) return;
+
+            CompletedEvent?.Invoke();
         }
     }
 }

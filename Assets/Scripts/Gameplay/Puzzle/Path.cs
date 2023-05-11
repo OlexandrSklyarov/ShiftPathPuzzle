@@ -24,6 +24,8 @@ namespace Gameplay.Puzzle
         private Cell[] _cells;
         private Ball[] _balls;
         private State _state;
+
+        public event Action RotateCompletedEvent;
        
 
         public void Init(PathData config)
@@ -82,6 +84,8 @@ namespace Gameplay.Puzzle
                 _balls.ArrayShiftBackwardByOne();
 
             SetState(State.READY);
+            
+            RotateCompletedEvent?.Invoke();
         }
 
         

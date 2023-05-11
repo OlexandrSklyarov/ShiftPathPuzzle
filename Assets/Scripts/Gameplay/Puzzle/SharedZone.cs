@@ -24,7 +24,8 @@ namespace Gameplay.Puzzle
         private bool _isBlocked;
         private SharedZoneData _config;
 
-        public event Action<SharedZone, Vector3> ShiftEvent;
+        public event Action<SharedZone, Vector3> TryShiftEvent;
+        public event Action ShiftCompletedEvent;
 
 
         public void Init(Data.SharedZoneData config)
@@ -63,7 +64,7 @@ namespace Gameplay.Puzzle
         {
             if (_isBlocked) return;
 
-            ShiftEvent?.Invoke(this, swipeDirection);
+            TryShiftEvent?.Invoke(this, swipeDirection);
         }
 
 
@@ -92,6 +93,7 @@ namespace Gameplay.Puzzle
                 {
                     _isBlocked = false;
                     OnShiftCompleted(dir);
+                    ShiftCompletedEvent?.Invoke();
                 });
         }
 
