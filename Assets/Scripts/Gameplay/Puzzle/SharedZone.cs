@@ -1,4 +1,5 @@
 using System;
+using Data;
 using DG.Tweening;
 using UnityEngine;
 
@@ -21,14 +22,15 @@ namespace Gameplay.Puzzle
         private ShiftState _curState;
         private float _pointOffsetDistance;
         private bool _isBlocked;
+        private SharedZoneData _config;
 
         public event Action<SharedZone, Vector3> ShiftEvent;
 
-        private const float SHIFT_DURATION = 0.25f;
 
-
-        public void Init()
+        public void Init(Data.SharedZoneData config)
         {
+            _config = config;
+            
             SetState(ShiftState.CENTER);
 
             var a = _slot_A.Cell.transform.position;
@@ -81,11 +83,11 @@ namespace Gameplay.Puzzle
 
             AttachBalls();
             
-            var value = transform.position.x + (int)dir * _pointOffsetDistance;
+            var pos = transform.position + transform.right * (int)dir * _pointOffsetDistance;
 
             transform
-                .DOLocalMoveX(value, SHIFT_DURATION)
-                .SetEase(Ease.InOutSine)
+                .DOLocalMove(pos, _config.ShiftDuration)
+                .SetEase(_config.ShiftEase)
                 .OnComplete(() => 
                 {
                     _isBlocked = false;
@@ -155,10 +157,8 @@ namespace Gameplay.Puzzle
                 case ShiftState.LEFT:
 
                     _slot_A.Path.InsertBallToIndex(_slot_B.Ball, _slot_A.Cell.MyIndex);  
-                    _slot_A.Path.UnBlock();
-                    _slot_A.Path.Refresh();
-
-                    _slot_B.Path.Block();
+                    _slot_A.Cell.UnBlock();
+                    _slot_B.Cell.Block();
 
                     break;
 
@@ -167,21 +167,16 @@ namespace Gameplay.Puzzle
                     _slot_A.Path.InsertBallToIndex(_slot_A.Ball, _slot_A.Cell.MyIndex);   
                     _slot_B.Path.InsertBallToIndex( _slot_B.Ball, _slot_B.Cell.MyIndex);
 
-                    _slot_A.Path.UnBlock();
-                    _slot_B.Path.UnBlock();
-
-                    _slot_A.Path.Refresh();
-                    _slot_B.Path.Refresh();
+                    _slot_A.Cell.UnBlock();
+                    _slot_B.Cell.UnBlock();
 
                     break;
 
                 case ShiftState.RIGHT:
 
                     _slot_B.Path.InsertBallToIndex(_slot_A.Ball, _slot_B.Cell.MyIndex);
-                    _slot_B.Path.UnBlock();
-                    _slot_B.Path.Refresh();
-
-                    _slot_A.Path.Block();
+                    _slot_B.Cell.UnBlock();
+                    _slot_A.Cell.Block();
 
                     break;
             }

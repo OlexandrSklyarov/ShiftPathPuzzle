@@ -21,3 +21,9 @@ MonoBehaviour:
     <Prefab>k__BackingField: {fileID: 8238381358576330954, guid: 433b64405a2997e51add7ab8b0408183, type: 3}
   - <Type>k__BackingField: 3
     <Prefab>k__BackingField: {fileID: 8238381358576330954, guid: d057a81c5248943ada495992152aa167, type: 3}
+  <Path>k__BackingField:
+    <ShiftDuration>k__BackingField: 0.15
+    <ShiftEase>k__BackingField: 22
+  <SharedZone>k__BackingField:
+    <ShiftDuration>k__BackingField: 0.15
+    <ShiftEase>k__BackingField: 3

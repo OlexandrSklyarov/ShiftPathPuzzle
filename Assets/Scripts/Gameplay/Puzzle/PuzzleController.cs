@@ -29,7 +29,7 @@ namespace Gameplay.Puzzle
             _sharedZones = GetComponentsInChildren<SharedZone>();
             Array.ForEach(_sharedZones, s => 
             {
-                s.Init();
+                s.Init(_config.SharedZone);
                 s.ShiftEvent += OnShiftSharedZoneHandler;
             });
         }
@@ -41,7 +41,7 @@ namespace Gameplay.Puzzle
 
             Array.ForEach(_paths, p =>
             {
-                p.Init();
+                p.Init(_config.Path);
                 p.SetStartupBalls(CreateBalls(p));
             });
 

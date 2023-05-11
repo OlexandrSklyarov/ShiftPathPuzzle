@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Linq;
+using Data;
 using DG.Tweening;
 using UnityEngine;
 using Util;
@@ -11,26 +12,24 @@ namespace Gameplay.Puzzle
     {
         private enum State {READY, WORKING}
 
-        public bool IsBlocked => _isBlocked;
+        public bool IsBlocked => _cells.Any(c => c.IsBlocked);
         public bool IsWorking => _state == State.WORKING;
         public ColorType Type => _type;
         public int CellCount => _cells.Length;
-        public bool IsCollected => !IsBlocked && AllBallsSomeColor();
-        
+        public bool IsCollected => !IsBlocked && AllBallsSomeColor();        
 
         [SerializeField] private ColorType _type;
 
+        private PathData _config;
         private Cell[] _cells;
         private Ball[] _balls;
         private State _state;
-        private bool _isBlocked;
-
-        private const float ROTATE_DURATION = 0.25f;
        
 
-        public void Init()
+        public void Init(PathData config)
         {
-
+            _config = config;
+            
             _cells = GetComponentsInChildren<Cell>();
 
             for (int i = 0; i < _cells.Length; i++) _cells[i].SetIndex(i);
@@ -45,7 +44,11 @@ namespace Gameplay.Puzzle
         public void SetStartupBalls(Ball[] balls) 
         {
             _balls = balls; 
-            Refresh();            
+
+            for (int i = 0; i < _cells.Length; i++)
+            {
+                SetupBall(i);
+            }         
         }     
 
 
@@ -72,7 +75,7 @@ namespace Gameplay.Puzzle
             SetState(State.WORKING);
             ShiftBalls(dir);
 
-            yield return new WaitForSeconds(ROTATE_DURATION);
+            yield return new WaitForSeconds(_config.ShiftDuration);
            
             _balls =  (dir > 0) ? 
                 _balls.ArrayShiftForwardByOne() :
@@ -90,18 +93,18 @@ namespace Gameplay.Puzzle
                 b.SetIndex(nextIndex);
             });
             
-            MoveBallToNextPosition(ROTATE_DURATION);
+            MoveBallToNextPosition();
         }       
 
 
-        private void MoveBallToNextPosition(float duration)
+        private void MoveBallToNextPosition()
         {
             for (int i = 0; i < _balls.Length; i++)
             {
 
                 _balls[i].transform
-                    .DOMove(_cells[_balls[i].MyIndex].transform.position, duration)
-                    .SetEase(Ease.InOutSine);
+                    .DOMove(_cells[_balls[i].MyIndex].transform.position, _config.ShiftDuration)
+                    .SetEase(_config.ShiftEase);
             }
         }
 
@@ -133,21 +136,6 @@ namespace Gameplay.Puzzle
             _balls[index].transform.position = _cells[index].transform.position;
             _balls[index].transform.SetParent(this.transform);
         }
-
-
-        public void Refresh()
-        {
-            for (int i = 0; i < _cells.Length; i++)
-            {
-                SetupBall(i);
-            }
-        }
-
-
-        public void Block() => _isBlocked = true;
-
-
-        public void UnBlock() => _isBlocked = false;
     }
 
 
