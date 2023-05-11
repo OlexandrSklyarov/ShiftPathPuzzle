@@ -44,7 +44,6 @@ namespace Gameplay.Puzzle
         private void SetState(ShiftState state) 
         {
             _curState = state;
-            name = $"SharesZone_{state}";
         }
 
 
