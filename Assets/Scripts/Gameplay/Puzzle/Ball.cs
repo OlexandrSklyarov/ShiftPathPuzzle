@@ -13,6 +13,9 @@ namespace Gameplay.Puzzle
 
         public event Action<Ball, Vector3> SwipeItemEvent;
 
+
+        private void Awake() => name = $"Ball_{GetInstanceID()}_{_type}";
+
         
         void IPuzzleInteract.Interact(Vector3 swipeDirection)
         {
@@ -20,11 +23,7 @@ namespace Gameplay.Puzzle
         }
 
 
-        public void SetIndex(int index) 
-        {
-            MyIndex = index;
-            name = $"Ball_{index}";
-        }     
+        public void SetIndex(int index) => MyIndex = index;
 
 
         public void SetCurrentPathColor(ColorType colorType) => CurrentPathColor = colorType;        

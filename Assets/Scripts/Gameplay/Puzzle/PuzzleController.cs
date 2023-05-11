@@ -27,9 +27,13 @@ namespace Gameplay.Puzzle
         private void InitSharedZones()
         {
             _sharedZones = GetComponentsInChildren<SharedZone>();
-            Array.ForEach(_sharedZones, s => s.Init());
+            Array.ForEach(_sharedZones, s => 
+            {
+                s.Init();
+                s.ShiftEvent += OnShiftSharedZoneHandler;
+            });
         }
-
+        
 
         private void InitPaths()
         {
@@ -87,16 +91,6 @@ namespace Gameplay.Puzzle
         }
 
 
-        private void OnSwipeBallHandler(Ball ball, Vector3 swipeDirection)
-        {
-            var path = _paths.First(p => p.Type == ball.CurrentPathColor);
-
-            if (path.IsBlocked) return;                        
-            
-            path.Rotate(swipeDirection, ball.MyIndex);
-        }
-
-
         private bool AllPathsCollected()
         {
             for (int i = 0; i < _paths.Length; i++)
@@ -105,6 +99,24 @@ namespace Gameplay.Puzzle
             }            
 
             return true;
+        }
+
+
+        private void OnSwipeBallHandler(Ball ball, Vector3 swipeDirection)
+        {
+            var path = _paths.First(p => p.Type == ball.CurrentPathColor);
+
+            if (path.IsWorking || path.IsBlocked) return;                        
+            
+            path.Rotate(swipeDirection, ball.MyIndex);
+        }
+
+
+        private void OnShiftSharedZoneHandler(SharedZone zone, Vector3 shiftDirection)
+        {
+            if (_paths.Any(p => p.IsWorking)) return;
+
+            zone.TryShift(shiftDirection);
         }
     }
 }

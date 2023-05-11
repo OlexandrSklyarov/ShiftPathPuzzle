@@ -17,3 +17,7 @@ MonoBehaviour:
     <Prefab>k__BackingField: {fileID: 8238381358576330954, guid: 365575e722568a0aea5a0ed114b57043, type: 3}
   - <Type>k__BackingField: 1
     <Prefab>k__BackingField: {fileID: 1525925728815617700, guid: dbecf656502f51ca689415d4f269a62d, type: 3}
+  - <Type>k__BackingField: 2
+    <Prefab>k__BackingField: {fileID: 8238381358576330954, guid: 433b64405a2997e51add7ab8b0408183, type: 3}
+  - <Type>k__BackingField: 3
+    <Prefab>k__BackingField: {fileID: 8238381358576330954, guid: d057a81c5248943ada495992152aa167, type: 3}

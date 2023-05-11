@@ -11,10 +11,11 @@ namespace Gameplay.Puzzle
     {
         private enum State {READY, WORKING}
 
-        public bool IsBlocked => _isBlocked || _state == State.WORKING;
+        public bool IsBlocked => _isBlocked;
+        public bool IsWorking => _state == State.WORKING;
         public ColorType Type => _type;
         public int CellCount => _cells.Length;
-        public bool IsCollected => AllBallsSomeColor();
+        public bool IsCollected => !IsBlocked && AllBallsSomeColor();
         
 
         [SerializeField] private ColorType _type;
@@ -24,7 +25,7 @@ namespace Gameplay.Puzzle
         private State _state;
         private bool _isBlocked;
 
-        private const float ROTATE_DURATION = 0.3f;
+        private const float ROTATE_DURATION = 0.25f;
        
 
         public void Init()
@@ -44,28 +45,14 @@ namespace Gameplay.Puzzle
         public void SetStartupBalls(Ball[] balls) 
         {
             _balls = balls; 
-
-            for (int i = 0; i < _cells.Length; i++)
-            {
-                SetupBall(i);
-            }
+            Refresh();            
         }     
 
 
         public void Rotate(Vector3 swipeDirection, int ballIndex)
         {
-            var dirType = GetRotateDirection(swipeDirection, ballIndex);            
-
-            switch(dirType)
-            {
-                case PathRotateDirection.FORWARD:
-                    StartCoroutine(RotateClockwise());
-                    break;
-
-                case PathRotateDirection.BACK:
-                    StartCoroutine(RotateCounterclockwise());
-                    break;
-            }
+            var dirType = GetRotateDirection(swipeDirection, ballIndex);  
+            StartCoroutine(Rotate((int)dirType));
         }
 
 
@@ -77,49 +64,41 @@ namespace Gameplay.Puzzle
             var dot = Vector3.Dot(swipeDirection, forward);
 
             return (dot >= 0) ? PathRotateDirection.FORWARD : PathRotateDirection.BACK;
-        }
+        }       
 
 
-        [ContextMenu("Rotate")]
-        private IEnumerator RotateClockwise()
-        {      
-            SetState(State.WORKING);
-
-            Array.ForEach(_balls, b => b.SetIndex(ChangeIndex(b.MyIndex + 1)));
-            MoveBallToNextPosition(ROTATE_DURATION); 
-
-            yield return new WaitForSeconds(ROTATE_DURATION);
-
-            SetState(State.READY);                     
-        }
-
-
-        [ContextMenu("Rotate back")]
-        private IEnumerator RotateCounterclockwise()
+        private IEnumerator Rotate(int dir)
         {
             SetState(State.WORKING);
-
-            Array.ForEach(_balls, b => b.SetIndex(ChangeIndex(b.MyIndex - 1)));
-            MoveBallToNextPosition(ROTATE_DURATION); 
+            ShiftBalls(dir);
 
             yield return new WaitForSeconds(ROTATE_DURATION);
+           
+            _balls =  (dir > 0) ? 
+                _balls.ArrayShiftForwardByOne() :
+                _balls.ArrayShiftBackwardByOne();
 
             SetState(State.READY);
         }
 
-
-        private int ChangeIndex(int index)
+        
+        private void ShiftBalls(int dir)
         {
-            if (index < 0) index = _cells.Length -1;
-            if (index > _cells.Length -1) index = 0;
-            return index;
-        }
+            Array.ForEach(_balls, b => 
+            {
+                var nextIndex = CollectionExtension.ArrayLoopingIndex(b.MyIndex + dir, _balls.Length);
+                b.SetIndex(nextIndex);
+            });
+            
+            MoveBallToNextPosition(ROTATE_DURATION);
+        }       
 
 
         private void MoveBallToNextPosition(float duration)
         {
             for (int i = 0; i < _balls.Length; i++)
             {
+
                 _balls[i].transform
                     .DOMove(_cells[_balls[i].MyIndex].transform.position, duration)
                     .SetEase(Ease.InOutSine);
@@ -134,26 +113,16 @@ namespace Gameplay.Puzzle
         }
 
 
-        public Ball GetRandomBall()
-        {
-            return _balls.RandomElement();
-        }
+        public Ball TakeBall(int index) => _balls[index];
+      
 
-
-        public Ball SwapBall(Ball newBall, int index)
-        {
-            var curBall = _balls[index];
-            _balls[index] = newBall;
-            SetupBall(index);
-
-            return curBall;
-        }
+        public Ball GetRandomBall() => _balls.RandomElement();    
 
 
         public void InsertBallToIndex(Ball ball, int index)
         {
             _balls[index] = ball;
-            SetupBall(index);
+            if (ball != null) SetupBall(index);
         }
 
 
@@ -162,14 +131,30 @@ namespace Gameplay.Puzzle
             _balls[index].SetIndex(index);
             _balls[index].SetCurrentPathColor(_type);
             _balls[index].transform.position = _cells[index].transform.position;
+            _balls[index].transform.SetParent(this.transform);
         }
+
+
+        public void Refresh()
+        {
+            for (int i = 0; i < _cells.Length; i++)
+            {
+                SetupBall(i);
+            }
+        }
+
+
+        public void Block() => _isBlocked = true;
+
+
+        public void UnBlock() => _isBlocked = false;
     }
 
 
     public enum PathRotateDirection
     {
-        FORWARD,
-        BACK
+        FORWARD = 1,
+        BACK = -1
     }
 
 
